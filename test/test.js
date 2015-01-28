@@ -4,6 +4,7 @@ var assert = require('assert');
 describe('engen.run()', function() {
 
   describe('basics', function() {
+
     it('should pass down arguments correctly', function(done) {
       function *b() {
         assert.deepEqual([].slice.apply(arguments), [12, 34, 56]);
@@ -41,6 +42,18 @@ describe('engen.run()', function() {
       engen.run(a(), function(err, val) {
         assert.equal(val, 12);
       });
+    });
+
+    it('should allow calling without a callback', function() {
+      function *b() {
+        return 12;
+      }
+
+      function *a() {
+        return yield b();
+      }
+
+      engen.run(a());
     });
   });
 

@@ -23,7 +23,7 @@ function step(iterator, error, returnValues, next) {
 
   var value = iteration.value;
 
-  if (iteration.done) return next(null, value);
+  if (iteration.done) return next && next(null, value);
 
   if (value instanceof ResumeHandler) {
     value.resume = function(error) {
