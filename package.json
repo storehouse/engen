@@ -1,0 +1,24 @@
+{
+  "name": "engen",
+  "version": "0.1.0",
+  "description": "Pure generators.",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:storehouse/engen.git"
+  },
+  "keywords": [
+    "generators",
+    "async",
+    "flow"
+  ],
+  "author": "Storehouse",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/storehouse/engen/issues"
+  },
+  "homepage": "https://github.com/storehouse/engen"
+}
