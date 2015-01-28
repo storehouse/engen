@@ -33,15 +33,17 @@ Wrap callback-style code and call it from generator-land.
 
 ```javascript
 var engen = require('engen');
-
-var wait = engen.wrap(function(time, cb) {
-  return setTimeout(cb, time);
-});
+var readFile = g.wrap(require('fs').readFile);
 
 function *f() {
-  yield wait(2000);
-  return 'done';
+  yield g.wait(1000);
+  return yield readFile('test.js');
 }
+
+engen.run(f(), function(err, res) {
+  console.log(err); // null
+  console.log(res); // <Buffer ...>
+});
 ```
 
 ### engen.wait()
