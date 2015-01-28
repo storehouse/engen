@@ -55,6 +55,20 @@ describe('engen.run()', function() {
 
       engen.run(a());
     });
+
+    it('should allow calling with a function as first parameter', function() {
+      function *b() {
+        return 12;
+      }
+
+      function *a() {
+        return yield b();
+      }
+
+      engen.run(a, function(err, value) {
+        assert.equal(value, 12);
+      });
+    });
   });
 
   describe('parallel execution', function() {
