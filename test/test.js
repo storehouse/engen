@@ -296,5 +296,22 @@ describe('engen.wrap()', function() {
       done();
     });
 
-  })
+  });
+
+  it('should convert errors into exceptions', function() {
+
+    var b = engen.wrap(function(cb) {
+      cb(new Error('oops'));
+    });
+
+    function *a() {
+      yield b();
+    }
+
+    engen.run(a(), function(err) {
+      assert(err);
+      assert(/oops/.test(err.message));
+    });
+
+  });
 });
