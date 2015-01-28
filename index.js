@@ -77,15 +77,15 @@ function step(iterator, error, returnValues, next) {
   }
 }
 
-var go = {};
+var engen = {};
 
-go.run = function(generator, callback) {
+engen.run = function(generator, callback) {
   if (typeof generator === 'function') generator = generator();
   if (!isGeneratorProto(generator)) throw new Error('First argument to run() must be a generator or a generator function, got: ' + generator);
   step(generator, null, [], callback);
 };
 
-go.wrap = function(f) {
+engen.wrap = function(f) {
   return function* wrapper() {
     var args = Array.prototype.slice.call(arguments);
     var resumeHandler = new ResumeHandler();
@@ -101,10 +101,10 @@ go.wrap = function(f) {
   };
 };
 
-go.wait = go.wrap(function(interval, cb) {
+engen.wait = engen.wrap(function(interval, cb) {
   setTimeout(function() {
     cb();
   }, interval);
 });
 
-module.exports = go;
+module.exports = engen;
