@@ -225,5 +225,30 @@ describe('engen.run()', function() {
     });
   });
 
+
+  describe('engen.wrap()', function() {
+    it('should allow wrapping a simple callback-based function', function(done) {
+
+      var wait = engen.wrap(function(time, cb) {
+        return setTimeout(cb, time);
+      });
+
+      var finished = false;
+
+      function *a() {
+        yield wait(20);
+        finished = true;
+      }
+
+      engen.run(a(), function() {
+        assert.equal(finished, true);
+        done();
+      });
+
+      assert.equal(finished, false);
+
+    });
+  });
+
 });
 
