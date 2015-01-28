@@ -152,6 +152,7 @@ describe('engen.run()', function() {
   });
 
   describe('exception handling', function() {
+
     it('should bubble up exceptions to the callback', function() {
       function *b() {
         throw new Error('crap');
@@ -223,32 +224,58 @@ describe('engen.run()', function() {
         assert(/Error: c/.test(err.message));
       });
     });
+
   });
 
+  describe('helpful usage error messages', function() {
 
-  describe('engen.wrap()', function() {
-    it('should allow wrapping a simple callback-based function', function(done) {
+    it('should throw when calling run() with unexpected first argument', function() {
+      assert.throws(
+        function() {
+          engen.run(123)
+        },
+        /argument to run\(\) must be/
+      );
+    });
 
-      var wait = engen.wrap(function(time, cb) {
-        return setTimeout(cb, time);
-      });
-
-      var finished = false;
+    it('should throw when yielding non-generators', function() {
 
       function *a() {
-        yield wait(20);
-        finished = true;
+        yield 123;
       }
 
-      engen.run(a(), function() {
-        assert.equal(finished, true);
-        done();
-      });
-
-      assert.equal(finished, false);
-
+      assert.throws(
+        function() {
+          engen.run(a())
+        },
+        /Yielded something other than/
+      );
     });
   });
 
 });
 
+
+describe('engen.wrap()', function() {
+  it('should allow wrapping a simple callback-based function', function(done) {
+
+    var wait = engen.wrap(function(time, cb) {
+      return setTimeout(cb, time);
+    });
+
+    var finished = false;
+
+    function *a() {
+      yield wait(20);
+      finished = true;
+    }
+
+    engen.run(a(), function() {
+      assert.equal(finished, true);
+      done();
+    });
+
+    assert.equal(finished, false);
+
+  });
+});
