@@ -249,7 +249,7 @@ describe('engen.run()', function() {
         function() {
           engen.run(a())
         },
-        /Yielded something other than/
+        /yielded something other than/
       );
     });
   });
