@@ -1,7 +1,28 @@
 function ResumeHandler() {}
 
+function MultipleErrors(errors) {
+  this.name = 'MultipleErrors';
+  this.message = 'engen: parallel yield got multiple errors:\n' + errors.map(function(err) {
+    return err.stack || err;
+  }).join('\n');
+}
+
+MultipleErrors.prototype = new Error();
+
 function isGeneratorProto(v) {
   return v && v.constructor && v.constructor.name == 'GeneratorFunctionPrototype';
+}
+
+function parallel(object, loop, callback) {
+  var keys = Object.keys(object);
+  var outstanding = keys.length;
+  for (var i = 0, l = keys.length; i < l; i++) {
+    loop(keys[i], object[keys[i]], done);
+  }
+  function done() {
+    outstanding--;
+    if (outstanding === 0) callback();
+  }
 }
 
 function step(iterator, error, returnValues, next) {
@@ -36,38 +57,30 @@ function step(iterator, error, returnValues, next) {
       step(iterator, null, [results], next);
       return;
     }
-    // jshint ignore:start
-    var keys = Object.keys(value);
     var errors = [];
-    var outstanding = keys.length;
-    for (var i = 0, l = keys.length; i < l; i++) {
-      if (!isGeneratorProto(value[keys[i]])) {
-        results[keys[i]] = value[keys[i]];
-        finish();
-        continue;
-      }
-      step(value[keys[i]], null, [], function(n, error, result) {
-        if (error) {
-          errors.push(error);
-        } else {
-          results[keys[n]] = result;
-        }
-        finish();
-      }.bind(null, i));
-      function finish() {
-        outstanding--;
-        if (outstanding === 0) {
-          if (errors.length === 1) {
-            step(iterator, errors[0], [], next);
-          } else if (errors.length > 1) {
-            step(iterator, new Error('engen: parallel yield got multiple errors:\n' + errors.map(function(err) { return err.stack; }).join('\n')), [], next);
+    parallel(value, function(key, val, done) {
+      if (!isGeneratorProto(val)) {
+        results[key] = val;
+        done();
+      } else {
+        step(val, null, [], function(error, result) {
+          if (error) {
+            errors.push(error);
           } else {
-            step(iterator, null, [results], next);
+            results[key] = result;
           }
-        }
+          done();
+        });
       }
-    }
-    // jshint ignore:end
+    }, function() {
+      if (errors.length === 1) {
+        step(iterator, errors[0], [], next);
+      } else if (errors.length > 1) {
+        step(iterator, new MultipleErrors(errors), [], next);
+      } else {
+        step(iterator, null, [results], next);
+      }
+    });
   } else {
     throw new Error('engen: yielded something other than a generator, an array of generators, or a ResumeHandler: ' + value);
   }
@@ -105,12 +118,6 @@ engen.wrap = function(f, callbackWrapper) {
   };
 };
 
-engen.wait = engen.wrap(function(interval, cb) {
-  setTimeout(function() {
-    cb();
-  }, interval);
-});
-
 engen.multipleReturnCallback = function(err) {
   if (err) throw err;
   return Array.prototype.slice.call(arguments, 1);
@@ -123,5 +130,11 @@ engen.noErrorCallback = function(value) {
 engen.multipleReturnNoErrorCallback = function() {
   return Array.prototype.slice.call(arguments);
 };
+
+engen.wait = engen.wrap(function(interval, cb) {
+  setTimeout(function() {
+    cb();
+  }, interval);
+});
 
 module.exports = engen;
