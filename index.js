@@ -138,26 +138,6 @@ go.wrap = function(f) {
   };
 };
 
-go.express = function(app) {
-  var methods = ['get', 'post', 'put', 'delete'];
-  methods.forEach(function(method) {
-    var original = app[method];
-    app[method] = function() {
-      var args = Array.prototype.slice.call(arguments);
-      args = args.map(function(arg) {
-        if (!isGenerator(arg)) return arg;
-        return function(req, res, next) {
-          step(arg(req, res, next), null, [], function(err, json) {
-            if (err) return next(err);
-            res.send(json);
-          });
-        };
-      });
-      return original.apply(app, args);
-    };
-  });
-};
-
 go.wait = go.wrap(function(interval, cb) {
   setTimeout(() => cb(), interval);
 });
