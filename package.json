@@ -4,7 +4,7 @@
   "description": "Async control flow using pure ES6 generators.",
   "main": "index.js",
   "scripts": {
-    "test": "node --harmony test.js"
+    "test": "mocha --harmony"
   },
   "repository": {
     "type": "git",
@@ -16,16 +16,22 @@
     "flow"
   ],
   "author": "Storehouse",
-  "contributors": [{
-    "name": "Stefano Attardi",
-    "email": "stefano@attardi.org"
-  }, {
-    "name": "Artem Nezvigin",
-    "email": "artem@artnez.com"
-  }],
+  "contributors": [
+    {
+      "name": "Stefano Attardi",
+      "email": "stefano@attardi.org"
+    },
+    {
+      "name": "Artem Nezvigin",
+      "email": "artem@artnez.com"
+    }
+  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/storehouse/engen/issues"
   },
-  "homepage": "https://github.com/storehouse/engen"
+  "homepage": "https://github.com/storehouse/engen",
+  "devDependencies": {
+    "mocha": "2.1.0"
+  }
 }
