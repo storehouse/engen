@@ -52,6 +52,81 @@ g.run(f(), function(err, res) {
 
 Generator-based version of `setTimeout`, provided for convenience.
 
+Yields
+------
+
+Yielding an array of generators will run them in parallel and return an array
+of ordered results.
+
+```javascript
+var g = require('engen');
+
+function *a() {
+  yield g.wait(2000);
+  return 'a';
+}
+
+function *b() {
+  yield g.wait(2000);
+  return 'b';
+}
+
+function *f() {
+  return yield [a(), b()]; // takes 2000ms
+}
+
+g.run(f(), function(err, res) {
+  console.log(err); // null
+  console.log(res); // ['a', 'b']
+});
+```
+
+Yielding an object of generators behaves identically to yielding an array, but
+the resulting value is an object.
+
+```javascript
+var g = require('engen');
+
+function *a() {
+  yield g.wait(2000);
+  return 'a';
+}
+
+function *b() {
+  yield g.wait(2000);
+  return 'b';
+}
+
+function *f() {
+  return yield {a: a(), b: b()}; // takes 2000ms
+}
+
+g.run(f(), function(err, res) {
+  console.log(err); // null
+  console.log(res); // {a: 'a', b: 'b'}
+});
+```
+
+Yielding anything other than a generator will return that value.
+
+```javascript
+var g = require('engen');
+
+function *a() {
+  yield g.wait(1000);
+  return 'a';
+}
+
+function *f() {
+  return yield [a(), false, null, {}];
+}
+
+g.run(f(), function(err, res) {
+  console.log(err); // null
+  console.log(res); // ['a', false, null, {}];
+});
+```
+
 License
 -------
 
