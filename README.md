@@ -12,7 +12,7 @@ API
 
 Run generator based code from callback-land.
 
-```
+```javascript
 var engen = require('engen');
 
 function *f() {
@@ -31,7 +31,7 @@ engen.run(f(), function(err, result) {
 
 Wrap callback-style code and call it from generator-land.
 
-```
+```javascript
 var engen = require('engen');
 
 var wait = engen.wrap(function(time, cb) {
