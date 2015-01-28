@@ -60,7 +60,7 @@ function step(iterator, error, returnValues, next) {
           if (errors.length === 1) {
             step(iterator, errors[0], [], next);
           } else if (errors.length > 1) {
-            step(iterator, new Error('Parallel yield got multiple errors:\n' + errors.map(function(err) { return err.stack; }).join('\n')), [], next);
+            step(iterator, new Error('engen: parallel yield got multiple errors:\n' + errors.map(function(err) { return err.stack; }).join('\n')), [], next);
           } else {
             step(iterator, null, [results], next);
           }
@@ -69,15 +69,19 @@ function step(iterator, error, returnValues, next) {
     }
     // jshint ignore:end
   } else {
-    throw new Error('Yielded something other than a generator, an array of generators, or a ResumeHandler: ' + value);
+    throw new Error('engen: yielded something other than a generator, an array of generators, or a ResumeHandler: ' + value);
   }
 }
 
 var engen = {};
 
 engen.run = function(generator, callback) {
-  if (typeof generator === 'function') generator = generator();
-  if (!isGeneratorProto(generator)) throw new Error('First argument to run() must be a generator or a generator function, got: ' + generator);
+  if (typeof generator === 'function') {
+    generator = generator();
+  }
+  if (!isGeneratorProto(generator)) {
+    throw new Error('engen: first argument to run() must be a generator or a generator function, got: ' + generator);
+  }
   step(generator, null, [], callback);
 };
 
@@ -87,7 +91,7 @@ engen.wrap = function(f) {
     var resumeHandler = new ResumeHandler();
     args.push(function() {
       if (!resumeHandler.resume) {
-        throw new Error('Wrapped function returned before its resumeHandler was ready: ' + f);
+        throw new Error('engen: wrapped function returned before its resumeHandler was ready: ' + f);
       }
       resumeHandler.resume.apply(null, arguments);
     });
