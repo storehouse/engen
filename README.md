@@ -21,7 +21,7 @@ function *f() {
 }
 
 engen.run(f(), function(err, result) {
-  if (err) return callback(err);
+  console.log(err); // null
   console.log(result); // 'done'
 });
 
