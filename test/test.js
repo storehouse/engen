@@ -149,6 +149,7 @@ describe('engen.run()', function() {
         engen.run(a(), done);
       }, Error);
     });
+
   });
 
   describe('exception handling', function() {
@@ -278,4 +279,22 @@ describe('engen.wrap()', function() {
     assert.equal(finished, false);
 
   });
+
+  it('should support functions that finish synchronously', function(done) {
+
+    var instant = engen.wrap(function(x, cb) {
+      cb(null, x);
+    });
+
+    function *a() {
+      var x = yield instant(20);
+      return x;
+    }
+
+    engen.run(a(), function(err, x) {
+      assert.equal(x, 20);
+      done();
+    });
+
+  })
 });
