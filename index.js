@@ -102,7 +102,9 @@ go.wrap = function(f) {
 };
 
 go.wait = go.wrap(function(interval, cb) {
-  setTimeout(() => cb(), interval);
+  setTimeout(function() {
+    cb();
+  }, interval);
 });
 
 module.exports = go;
