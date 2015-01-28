@@ -13,14 +13,14 @@ API
 Run generator based code from callback-land.
 
 ```javascript
-var engen = require('engen');
+var g = require('engen');
 
 function *f() {
-  yield engen.wait(2000);
+  yield g.wait(2000);
   return 'done';
 }
 
-engen.run(f(), function(err, result) {
+g.run(f(), function(err, result) {
   console.log(err); // null
   console.log(result); // 'done'
 });
@@ -32,7 +32,7 @@ engen.run(f(), function(err, result) {
 Wrap callback-style code and call it from generator-land.
 
 ```javascript
-var engen = require('engen');
+var g = require('engen');
 var readFile = g.wrap(require('fs').readFile);
 
 function *f() {
@@ -40,7 +40,7 @@ function *f() {
   return yield readFile('test.js');
 }
 
-engen.run(f(), function(err, res) {
+g.run(f(), function(err, res) {
   console.log(err); // null
   console.log(res); // <Buffer ...>
 });
