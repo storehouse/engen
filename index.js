@@ -34,51 +34,14 @@ function step(iterator, error, returnValues, next) {
     step(value, null, [], function(error) {
       step(iterator, error, Array.prototype.slice.call(arguments, 1), next);
     });
-  } else if (Array.isArray(value)) {
-    if (!value.length) {
-      step(iterator, null, [[]], next);
-      return;
-    }
-    // jshint ignore:start
-    var results = [];
-    var errors = [];
-    var outstanding = value.length;
-    for (var i = 0, l = value.length; i < l; i++) {
-      if (!isGeneratorProto(value[i])) {
-        results[i] = value[i];
-        finish();
-        continue;
-      }
-      step(value[i], null, [], function(n, error, result) {
-        if (error) {
-          errors.push(error);
-        } else {
-          results[n] = result;
-        }
-        finish();
-      }.bind(null, i));
-      function finish() {
-        outstanding--;
-        if (outstanding === 0) {
-          if (errors.length === 1) {
-            step(iterator, errors[0], [], next);
-          } else if (errors.length > 1) {
-            step(iterator, new Error('Parallel yield got multiple errors:\n' + errors.map(function(err) { return err.stack || err; }).join('\n')), [], next);
-          } else {
-            step(iterator, null, [results], next);
-          }
-        }
-      }
-    }
-    // jshint ignore:end
   } else if (typeof value == 'object') {
+    var results = Array.isArray(value) ? [] : {};
     if (!Object.keys(value).length) {
-      step(iterator, null, [{}], next);
+      step(iterator, null, [results], next);
       return;
     }
     // jshint ignore:start
     var keys = Object.keys(value);
-    var results = {};
     var errors = [];
     var outstanding = keys.length;
     for (var i = 0, l = keys.length; i < l; i++) {
