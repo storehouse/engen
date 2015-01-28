@@ -1,9 +1,5 @@
 function ResumeHandler() {}
 
-function isGenerator(v) {
-  return v && v.constructor && v.constructor.name == 'GeneratorFunction';
-}
-
 function isGeneratorProto(v) {
   return v && v.constructor && v.constructor.name == 'GeneratorFunctionPrototype';
 }
