@@ -85,7 +85,7 @@ engen.run = function(generator, callback) {
   step(generator, null, [], callback);
 };
 
-engen.wrap = function(f) {
+engen.wrap = function(f, callbackWrapper) {
   return function* wrapper() {
     var args = Array.prototype.slice.call(arguments);
     var resumeHandler = new ResumeHandler();
@@ -93,7 +93,11 @@ engen.wrap = function(f) {
       if (!resumeHandler.resume) {
         throw new Error('engen: wrapped function returned before its resumeHandler was ready: ' + f);
       }
-      resumeHandler.resume.apply(null, arguments);
+      try {
+        resumeHandler.resume.apply(null, callbackWrapper ? [null, callbackWrapper.apply(this, arguments)] : arguments);
+      } catch(err) {
+        resumeHandler.resume.call(null, err);
+      }
     });
     yield resumeHandler;
     f.apply(this, args);
@@ -106,5 +110,18 @@ engen.wait = engen.wrap(function(interval, cb) {
     cb();
   }, interval);
 });
+
+engen.multipleReturnCallback = function(err) {
+  if (err) throw err;
+  return Array.prototype.slice.call(arguments, 1);
+};
+
+engen.noErrorCallback = function(value) {
+  return value;
+};
+
+engen.multipleReturnNoErrorCallback = function() {
+  return Array.prototype.slice.call(arguments);
+};
 
 module.exports = engen;

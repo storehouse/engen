@@ -258,78 +258,220 @@ describe('engen.run()', function() {
 
 
 describe('engen.wrap()', function() {
-  it('should allow wrapping a simple callback-based function', function(done) {
 
-    var wait = engen.wrap(function(time, cb) {
-      return setTimeout(cb, time);
+  describe('basics', function() {
+
+    it('should allow wrapping a simple callback-based function', function(done) {
+
+      var wait = engen.wrap(function(time, cb) {
+        return setTimeout(cb, time);
+      });
+
+      var finished = false;
+
+      function *a() {
+        yield wait(20);
+        finished = true;
+      }
+
+      engen.run(a(), function() {
+        assert.equal(finished, true);
+        done();
+      });
+
+      assert.equal(finished, false);
+
     });
 
-    var finished = false;
+    it('should support functions that finish synchronously', function(done) {
 
-    function *a() {
-      yield wait(20);
-      finished = true;
-    }
+      var instant = engen.wrap(function(x, cb) {
+        cb(null, x);
+      });
 
-    engen.run(a(), function() {
-      assert.equal(finished, true);
-      done();
+      function *a() {
+        var x = yield instant(20);
+        return x;
+      }
+
+      engen.run(a(), function(err, x) {
+        assert.equal(x, 20);
+        done();
+      });
+
     });
 
-    assert.equal(finished, false);
+    it('should return first value from callbacks with multiple return values', function(done) {
+      var b = engen.wrap(function(cb) {
+        cb(null, 12, 34, 56);
+      });
+
+      function *a() {
+        var res = yield b();
+        assert.equal(res, 12);
+        return res;
+      }
+
+      engen.run(a(), function(err, res) {
+        assert.ifError(err);
+        assert.equal(res, 12);
+        done();
+      });
+    });
+
+    it('should convert errors into exceptions', function() {
+
+      var b = engen.wrap(function(cb) {
+        cb(new Error('oops'));
+      });
+
+      function *a() {
+        yield b();
+      }
+
+      engen.run(a(), function(err) {
+        assert(err);
+        assert(/oops/.test(err.message));
+      });
+
+    });
 
   });
 
-  it('should support functions that finish synchronously', function(done) {
+  describe('callback wrapper', function() {
 
-    var instant = engen.wrap(function(x, cb) {
-      cb(null, x);
+    it('should allow wrapping callbacks with multiple return values', function(done) {
+
+      var b = engen.wrap(function(cb) {
+        cb(null, 12, 34, 56);
+      }, function(err, a, b, c) {
+        if (err) throw err;
+        return [a, b, c];
+      });
+
+      function *a() {
+        var res = yield b();
+        assert.deepEqual(res, [12, 34, 56]);
+        return res;
+      }
+
+      engen.run(a(), function(err, res) {
+        assert.ifError(err);
+        assert.deepEqual(res, [12, 34, 56]);
+        done();
+      });
+
     });
 
-    function *a() {
-      var x = yield instant(20);
-      return x;
-    }
+    it('should allow wrapping callbacks without an error parameter', function(done) {
 
-    engen.run(a(), function(err, x) {
-      assert.equal(x, 20);
-      done();
+      var b = engen.wrap(function(cb) {
+        cb(12, 34, 56);
+      }, function(a, b, c) {
+        return [a, b, c];
+      });
+
+      function *a() {
+        var res = yield b();
+        assert.deepEqual(res, [12, 34, 56]);
+        return res;
+      }
+
+      engen.run(a(), function(err, res) {
+        assert.ifError(err);
+        assert.deepEqual(res, [12, 34, 56]);
+        done();
+      });
+
     });
 
+    it('should allow wrapping callbacks with multiple return values using multipleReturnCallback', function(done) {
+
+      var b = engen.wrap(function(cb) {
+        cb(null, 12, 34, 56);
+      }, engen.multipleReturnCallback);
+
+      function *a() {
+        var res = yield b();
+        assert.deepEqual(res, [12, 34, 56]);
+        return res;
+      }
+
+      engen.run(a(), function(err, res) {
+        assert.ifError(err);
+        assert.deepEqual(res, [12, 34, 56]);
+        done();
+      });
+
+    });
+
+    it('should allow wrapping callbacks without an error parameter using noErrorCallback', function(done) {
+
+      var b = engen.wrap(function(cb) {
+        cb(12);
+      }, engen.noErrorCallback);
+
+      function *a() {
+        var res = yield b();
+        assert.deepEqual(res, 12);
+        return res;
+      }
+
+      engen.run(a(), function(err, res) {
+        assert.ifError(err);
+        assert.deepEqual(res, 12);
+        done();
+      });
+
+    });
+
+    it('should allow wrapping callbacks with multiple return values an error parameter using multipleReturnNoErrorCallback', function(done) {
+
+      var b = engen.wrap(function(cb) {
+        cb(12, 34, 56);
+      }, engen.multipleReturnNoErrorCallback);
+
+      function *a() {
+        var res = yield b();
+        assert.deepEqual(res, [12, 34, 56]);
+        return res;
+      }
+
+      engen.run(a(), function(err, res) {
+        assert.ifError(err);
+        assert.deepEqual(res, [12, 34, 56]);
+        done();
+      });
+
+    });
+
+    it('should handle exceptions from wrapped callbacks', function(done) {
+
+      var b = engen.wrap(function(cb) {
+        cb(new Error('oops'), 12, 34, 56);
+      }, function(err, a, b, c) {
+        if (err) throw err;
+        return [a, b, c];
+      });
+
+      function *a() {
+        try {
+          var res = yield b();
+        } catch(err) {
+          assert(err);
+          assert(/oops/.test(err.message));
+          throw err;
+        }
+        return res;
+      }
+
+      engen.run(a(), function(err, res) {
+        assert(err);
+        assert(/oops/.test(err.message));
+        done();
+      });
+
+    });
   });
 
-  xit('should support functions with multiple return values', function(done) {
-    var b = engen.wrap(function(cb) {
-      cb(null, 12, 34, 56);
-    });
-
-    function *a() {
-      var res = yield b();
-      assert.equal(res, [12, 34, 56]);
-      return res;
-    }
-
-    engen.run(a(), function(err, res) {
-      assert.ifError(err);
-      assert.equal(res, [12, 34, 56]);
-      done();
-    });
-  });
-
-  it('should convert errors into exceptions', function() {
-
-    var b = engen.wrap(function(cb) {
-      cb(new Error('oops'));
-    });
-
-    function *a() {
-      yield b();
-    }
-
-    engen.run(a(), function(err) {
-      assert(err);
-      assert(/oops/.test(err.message));
-    });
-
-  });
 });
