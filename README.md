@@ -5,6 +5,11 @@ engen
 
 Async control flow using pure ES6 generators.
 
+ES6
+---
+
+Requires ES6 generator support. Tested on Node 0.11 with the `--harmony` flag.
+
 API
 ---
 
