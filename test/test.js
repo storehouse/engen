@@ -201,7 +201,7 @@ describe('engen.run()', function() {
 
       engen.run(a(), function(err) {
         assert(err);
-        assert(/multiple errors/.test(err.message));
+        assert(/multiple errors/.test(err.message), err.message);
         assert(/Error: b/.test(err.message));
         assert(/Error: c/.test(err.message));
       });
@@ -214,7 +214,7 @@ describe('engen.run()', function() {
     it('should throw when calling run() with unexpected first argument', function() {
       assert.throws(
         function() {
-          engen.run(123)
+          engen.run(123);
         },
         /argument to run\(\) must be/
       );
@@ -228,29 +228,29 @@ describe('engen.run()', function() {
 
       assert.throws(
         function() {
-          engen.run(a())
+          engen.run(a());
         },
         /yielded something other than/
       );
     });
 
     xit('should throw when yielding a nested array of generators', function(done) {
-       function *c() {
-         return 23;
-       }
+      function *c() {
+        return 23;
+      }
 
-       function *b() {
-         return 12;
-       }
+      function *b() {
+        return 12;
+      }
 
-       function *a() {
-         var res = yield [b(), [c()]];
-       }
+      function *a() {
+        yield [b(), [c()]];
+      }
 
-       assert.throws(function() {
-         engen.run(a(), done);
-       }, Error);
-     });
+      assert.throws(function() {
+        engen.run(a(), done);
+      }, Error);
+    });
 
   });
 
@@ -455,8 +455,9 @@ describe('engen.wrap()', function() {
       });
 
       function *a() {
+        var res;
         try {
-          var res = yield b();
+          res = yield b();
         } catch(err) {
           assert(err);
           assert(/oops/.test(err.message));
