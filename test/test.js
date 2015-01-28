@@ -298,6 +298,24 @@ describe('engen.wrap()', function() {
 
   });
 
+  xit('should support functions with multiple return values', function(done) {
+    var b = engen.wrap(function(cb) {
+      cb(null, 12, 34, 56);
+    });
+
+    function *a() {
+      var res = yield b();
+      assert.equal(res, [12, 34, 56]);
+      return res;
+    }
+
+    engen.run(a(), function(err, res) {
+      assert.ifError(err);
+      assert.equal(res, [12, 34, 56]);
+      done();
+    });
+  });
+
   it('should convert errors into exceptions', function() {
 
     var b = engen.wrap(function(cb) {
