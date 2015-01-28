@@ -131,25 +131,6 @@ describe('engen.run()', function() {
 
       engen.run(a(), done);
     });
-
-   xit('should not allow nested arrays of generators', function(done) {
-      function *c() {
-        return 23;
-      }
-
-      function *b() {
-        return 12;
-      }
-
-      function *a() {
-        var res = yield [b(), [c()]];
-      }
-
-      assert.throws(function() {
-        engen.run(a(), done);
-      }, Error);
-    });
-
   });
 
   describe('exception handling', function() {
@@ -252,6 +233,25 @@ describe('engen.run()', function() {
         /yielded something other than/
       );
     });
+
+    xit('should throw when yielding a nested array of generators', function(done) {
+       function *c() {
+         return 23;
+       }
+
+       function *b() {
+         return 12;
+       }
+
+       function *a() {
+         var res = yield [b(), [c()]];
+       }
+
+       assert.throws(function() {
+         engen.run(a(), done);
+       }, Error);
+     });
+
   });
 
 });
