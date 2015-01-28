@@ -3,9 +3,142 @@
 engen
 =====
 
+> The generator engine.
+
 Async control flow using pure ES6 generators.
 
 Requires ES6 generator support. Tested on Node 0.11 with the `--harmony` flag.
+
+Async code based on `yield`
+---------------------------
+
+With generators, calling an asynchronous function and waiting for its result is
+as simple as calling `yield f()`. Parameters and return values work exactly as if
+the code were synchronous.
+
+```javascript
+var g = require('engen');
+
+function *c(x) {
+  yield g.wait(1000);
+  return x;
+}
+
+function *b() {
+  return yield c('b'); // takes 1000ms
+}
+
+function *a() {
+  var b = yield b();
+  return 'a' + b;
+}
+
+g.run(a(), function(err, res) {
+  console.log(err); // null
+  console.log(res); // 'ab'
+});
+```
+
+Yielding an array of generators will run them in parallel and return an array
+of ordered results.
+
+```javascript
+var g = require('engen');
+
+function *a() {
+  yield g.wait(1000);
+  return 'a';
+}
+
+function *b() {
+  yield g.wait(2000);
+  return 'b';
+}
+
+function *f() {
+  return yield [a(), b()]; // takes 2000ms
+}
+
+g.run(f(), function(err, res) {
+  console.log(err); // null
+  console.log(res); // ['a', 'b']
+});
+```
+
+Yielding an object of generators behaves identically to yielding an array, but
+the resulting value is an object.
+
+```javascript
+var g = require('engen');
+
+function *a() {
+  yield g.wait(1000);
+  return 'a';
+}
+
+function *b() {
+  yield g.wait(2000);
+  return 'b';
+}
+
+function *f() {
+  return yield {a: a(), b: b()}; // takes 2000ms
+}
+
+g.run(f(), function(err, res) {
+  console.log(err); // null
+  console.log(res); // {a: 'a', b: 'b'}
+});
+```
+
+Yielding anything other than a generator will return that value.
+
+```javascript
+var g = require('engen');
+
+function *a() {
+  yield g.wait(1000);
+  return 'a';
+}
+
+function *f() {
+  return yield [a(), false, null, {}];
+}
+
+g.run(f(), function(err, res) {
+  console.log(err); // null
+  console.log(res); // ['a', false, null, {}];
+});
+```
+
+Exceptions also behave as if the code were synchronous:
+
+```javascript
+var g = require('engen');
+
+function *b() {
+  yield g.wait(1000);
+  throw Error('oops');
+}
+
+function *a() {
+  try {
+    yield b(); // takes 1000ms
+  } catch(err) {
+    console.log(err) // 'Error: oops'
+  }
+  return 'a';
+}
+
+g.run(a(), function(err, res) {
+  console.log(err); // null
+});
+
+g.run(a(), function(err, res) {
+  console.log(err); // 'Error: oops'
+});
+```
+
 
 API
 ---
@@ -88,79 +221,15 @@ For your convenience, these two handlers are built in, as `g.multipleReturnCallb
 
 Generator-based version of `setTimeout`, provided for convenience.
 
-Yields
-------
-
-Yielding an array of generators will run them in parallel and return an array
-of ordered results.
-
 ```javascript
 var g = require('engen');
 
-function *a() {
-  yield g.wait(2000);
-  return 'a';
-}
-
-function *b() {
-  yield g.wait(2000);
-  return 'b';
-}
-
 function *f() {
-  return yield [a(), b()]; // takes 2000ms
+  yield g.wait(1000); // pauses for 1000ms
+  return 'done';
 }
 
-g.run(f(), function(err, res) {
-  console.log(err); // null
-  console.log(res); // ['a', 'b']
-});
-```
-
-Yielding an object of generators behaves identically to yielding an array, but
-the resulting value is an object.
-
-```javascript
-var g = require('engen');
-
-function *a() {
-  yield g.wait(2000);
-  return 'a';
-}
-
-function *b() {
-  yield g.wait(2000);
-  return 'b';
-}
-
-function *f() {
-  return yield {a: a(), b: b()}; // takes 2000ms
-}
-
-g.run(f(), function(err, res) {
-  console.log(err); // null
-  console.log(res); // {a: 'a', b: 'b'}
-});
-```
-
-Yielding anything other than a generator will return that value.
-
-```javascript
-var g = require('engen');
-
-function *a() {
-  yield g.wait(1000);
-  return 'a';
-}
-
-function *f() {
-  return yield [a(), false, null, {}];
-}
-
-g.run(f(), function(err, res) {
-  console.log(err); // null
-  console.log(res); // ['a', false, null, {}];
-});
+g.run(f());
 ```
 
 License
