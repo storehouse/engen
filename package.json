@@ -16,6 +16,13 @@
     "flow"
   ],
   "author": "Storehouse",
+  "contributors": [{
+    "name": "Stefano Attardi",
+    "email": "stefano@attardi.org"
+  }, {
+    "name": "Artem Nezvigin",
+    "email": "artem@artnez.com"
+  }],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/storehouse/engen/issues"
