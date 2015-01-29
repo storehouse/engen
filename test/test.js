@@ -466,7 +466,7 @@ describe('engen.wrap()', function() {
         return res;
       }
 
-      engen.run(a(), function(err, res) {
+      engen.run(a(), function(err/*, res*/) {
         assert(err);
         assert(/oops/.test(err.message));
         done();

@@ -4,7 +4,8 @@
   "description": "Async control flow using pure ES6 generators.",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --harmony"
+    "test": "mocha --harmony",
+    "lint": "jshint index.js"
   },
   "repository": {
     "type": "git",
@@ -32,6 +33,7 @@
   },
   "homepage": "https://github.com/storehouse/engen",
   "devDependencies": {
+    "jshint": "2.6.0",
     "mocha": "2.1.0"
   }
 }
