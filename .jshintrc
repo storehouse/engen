@@ -1,35 +1,21 @@
 {
-  "-W078": true,
-  "forin": true,
   "indent": 2,
   "latedef": "nofunc",
-  "newcap": true,
   "noempty": true,
   "quotmark": true,
   "undef": true,
-  "unused": "vars",
-  "trailing": true,
-  "laxbreak": true,
+  "unused": true,
   "lastsemic": true,
 
-  "eqnull": true,
   "esnext": true,
-  "evil": true,
-  "expr": true,
-  "laxcomma": true,
-  "proto": true,
-  "shadow": true,
   "noyield": true,
 
   "devel": true,
   "node": true,
-  "worker": true,
 
   "globals": {
     "describe": false,
     "it": false,
-    "xit": false,
-    "Set": true,
-    "Error": true
+    "xit": false
   }
 }
