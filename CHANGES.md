@@ -1,6 +1,12 @@
 Changes
 =======
 
+0.1.3
+-----
+
+- doc updates
+- cleanup
+
 0.1.2
 -----
 
