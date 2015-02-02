@@ -124,9 +124,8 @@ describe('engen.run()', function() {
       }
 
       function *a() {
-        var res = yield [b(), 456];
-        assert.equal(res[0], 12);
-        assert.equal(res[1], 456);
+        var res = yield [b(), 456, null];
+        assert.deepEqual(res, [12, 456, null]);
       }
 
       engen.run(a(), done);
@@ -232,6 +231,18 @@ describe('engen.run()', function() {
         },
         /yielded something other than/
       );
+
+      function *a() {
+        yield null;
+      }
+
+      assert.throws(
+        function() {
+          engen.run(a());
+        },
+        /yielded something other than/
+      );
+
     });
 
     xit('should throw when yielding a nested array of generators', function(done) {

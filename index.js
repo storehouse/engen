@@ -51,7 +51,7 @@ function step(iterator, error, returnValues, next) {
     step(value, null, [], function(error) {
       step(iterator, error, Array.prototype.slice.call(arguments, 1), next);
     });
-  } else if (typeof value == 'object') {
+  } else if (value !== null && typeof value == 'object') {
     var results = Array.isArray(value) ? [] : {};
     if (!Object.keys(value).length) {
       step(iterator, null, [results], next);
