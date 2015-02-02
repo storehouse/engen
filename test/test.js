@@ -258,9 +258,12 @@ describe('engen.run()', function() {
         yield [b(), [c()]];
       }
 
-      assert.throws(function() {
-        engen.run(a(), done);
-      }, Error);
+      assert.throws(
+        function() {
+          engen.run(a(), done);
+        },
+        /do not nest/
+      );
     });
 
   });
