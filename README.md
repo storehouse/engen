@@ -91,7 +91,10 @@ g.run(f(), function(err, res) {
 });
 ```
 
-Yielding anything other than a generator will return that value.
+Inside collections, mixing generators and simple values is allowed.
+Generators will be waited for, anything else will be passed through untouched.
+
+**Note**: this includes objects and arrays: be careful not to nest collections of generators.
 
 ```javascript
 var g = require('engen');
