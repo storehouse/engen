@@ -137,7 +137,7 @@ g.run(a(), function(err, res) {
   console.log(err); // null
 });
 
-g.run(a(), function(err, res) {
+g.run(b(), function(err, res) {
   console.log(err); // 'Error: oops'
 });
 ```
