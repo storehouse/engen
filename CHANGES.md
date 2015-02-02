@@ -1,6 +1,12 @@
 Changes
 =======
 
+0.1.4
+-----
+
+- fix error when yielding null
+- readme updates
+
 0.1.3
 -----
 
