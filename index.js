@@ -3,7 +3,8 @@ function ResumeHandler() {}
 function MultipleErrors(errors) {
   this.name = 'MultipleErrors';
   this.message = 'engen: parallel yield got multiple errors:\n' + errors.map(function(err) {
-    return err.stack || err;
+    var message = err instanceof Error ? err.message : JSON.stringify(err);
+    return message + '\n\n' + err.stack;
   }).join('\n');
 }
 
