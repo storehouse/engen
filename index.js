@@ -46,7 +46,7 @@ function step(iterator, error, returnValues, next) {
 
   if (iteration.done) return next && next(null, value);
 
-  if (value && value.__engen_resumehandler__) {
+  if (value && (value.__engen_resumehandler__ || value instanceof ResumeHandler)) {
     value.resume = function(error) {
       setTimeout(step.bind(null, iterator, error, Array.prototype.slice.call(arguments, 1), next), 0);
     };
