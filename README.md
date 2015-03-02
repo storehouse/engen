@@ -7,7 +7,7 @@ engen
 
 Async control flow using pure ES6 generators.
 
-Requires ES6 generator support. Tested on Node 0.11 with the `--harmony` flag.
+Requires ES6 generator support. Tested on Node 0.12 with the `--harmony` flag.
 
 Async code based on `yield`
 ---------------------------
