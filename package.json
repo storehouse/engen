@@ -1,6 +1,6 @@
 {
   "name": "engen",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Async control flow using pure ES6 generators.",
   "main": "index.js",
   "scripts": {
