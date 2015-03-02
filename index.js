@@ -1,4 +1,6 @@
-function ResumeHandler() {}
+function ResumeHandler() {
+  this.__engen_resumehandler__ = true;
+}
 
 function MultipleErrors(errors) {
   this.name = 'MultipleErrors';
@@ -44,7 +46,7 @@ function step(iterator, error, returnValues, next) {
 
   if (iteration.done) return next && next(null, value);
 
-  if (value instanceof ResumeHandler) {
+  if (value && value.__engen_resumehandler__) {
     value.resume = function(error) {
       setTimeout(step.bind(null, iterator, error, Array.prototype.slice.call(arguments, 1), next), 0);
     };
