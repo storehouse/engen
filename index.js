@@ -14,7 +14,7 @@ MultipleErrors.prototype = Object.create(Error.prototype);
 MultipleErrors.prototype.constructor = MultipleErrors;
 
 function isGeneratorProto(v) {
-  return v && v.constructor && v.constructor.name == 'GeneratorFunctionPrototype';
+  return v+'' == '[object Generator]';
 }
 
 function parallel(object, loop, callback) {
